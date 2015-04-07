@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=GvyC1Gks2WvHhNzk7lHxBteQ"></script>
+    <link rel="stylesheet" href="js/leigou.css" />
+    <script type="text/javascript" src="js/grid.js"></script>
+    <script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+    <!--加载鼠标绘制工具-->
+    <script type="text/javascript" src="js/DrawingManager_min.js"></script>
+    <link rel="stylesheet" href="js/DrawingManager_min.css" />
+    <!--加载检索信息窗口-->
+    <script type="text/javascript" src="js/SearchInfoWindow_min.js"></script>
+    <link rel="stylesheet" href="js/SearchInfoWindow_min.css" />
+    <title>小区雷购</title>
+</head>
+<body>
+    <div>
+        面积:<label id="area"></label>
+        <!--区域(121.761500,31.408255,121.363500,31.010255)-->
+        <!--lng: <input type="text" id="lng" value="31.120255" /> Lat:<input type="text" id="lng" value="121.473500" /><input type="button" id="query1" value="search" />-->
+        Edge_only<input id="edge" type="checkbox" checked="checked" />
+
+        | <input type="button" id="shangjia_create" value="创建商家" />商家名字<input type="text" id="shangjia" value="test" />
+        
+        <select id="ShangjiaList"></select>
+        <input type="button" id="shangjia_show" value="显示商家" />
+
+        <input type="button" id="shangjia_search" value="寻找商家" />
+
+
+    </div>
+    <div id="allmap" style="overflow:hidden;zoom:1;position:relative;">
+        <div id="map" style="height:100%;-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;"></div>
+    </div>
+    <div id="result">
+        <!--<input type="button" value="获取绘制的覆盖物个数" onclick="alert(overlays.length)" />-->
+        <input type="button" value="清除所有覆盖物" onclick="clearAll()" />
+    </div>
+    <script type="text/javascript">
+
+        //刻度
+        var grid_scale = 0.005;
+        //格数
+        var grid_number = 5;
+
+        // 百度地图API功能
+        var x = 121.563500;
+        var y = 31.210255;
+
+        var map = new BMap.Map("map");
+        var point = new BMap.Point(x, y);
+        map.centerAndZoom(point, 16);
+        map.enableScrollWheelZoom();
+        map.disableDoubleClickZoom();
+        //map.disableDragging();
+        map.addControl(new BMap.NavigationControl());
+        //map.add_control(new BMap.ScaleControl())
+
+        var top_left_control = new BMap.ScaleControl({ anchor: BMAP_ANCHOR_TOP_LEFT });
+        map.addControl(top_left_control);
+        //画网格
+        //var grid = add_overlay(map, x, y, grid_scale, grid_number);
+        var grid = [];
+        var code_list = [];
+
+
+        var bianchang = map.getDistance(new BMap.Point(121.761500, 31.408255), new BMap.Point(121.761500, 31.01025)).toFixed(0) + '米'
+        var bianchang1 = map.getDistance(new BMap.Point(121.761500, 31.408255), new BMap.Point(121.363500, 31.408255)).toFixed(0) + '米'
+        $("#area").text(bianchang + "*" + bianchang1);
+
+        draw1(map);
+        ShowGrid();
+        //var init=0;
+        //if (init == 0) {
+        //    var url = "/rest/rest/query1/address/1?lng=" + x + "&lat=" + y + "&limit=5";
+        //    $.ajaxSetup({ async: false });
+        //    var index = 0;
+        //    var t = $.getJSON(url, function (data) {
+        //        for (var i in data) {
+        //            var lat = data[i]["lat"];
+        //            var lng = data[i]["lng"];
+        //            var code = data[i]["code"];
+
+        //            var oo = draw_overlay(map, lng, lat, code);
+                    
+        //            grid[index] = oo;
+        //            code_list[index] = code;
+        //            index++;
+        //        }
+        //    });
+        //    init = 1;
+        //}
+
+        //显示网格
+        function ShowGrid(){
+            var init=0;
+            if (init == 0) {
+                var url = "/rest/rest/query1/address/1?lng=" + x + "&lat=" + y + "&limit=5";
+                $.ajaxSetup({ async: false });
+                var index = 0;
+                var t = $.getJSON(url, function (data) {
+                    for (var i in data) {
+                        var lat = data[i]["lat"];
+                        var lng = data[i]["lng"];
+                        var code = data[i]["code"];
+
+                        var oo = draw_overlay(map, lng, lat, code);
+
+                        grid[index] = oo;
+                        code_list[index] = code;
+                        index++;
+                    }
+                });
+                init = 1;
+            }
+        }
+        var overlays = [];
+        var overlaycomplete = function (e) {
+            overlays.push(e.overlay);
+
+            var mode=e.drawingMode;
+            if (mode == "polygon") {
+                //alert($('#edge').is(':checked'));
+                var o = e.overlay.Fn
+                shangjia_create_list = o;
+                if ($('#edge').is(':checked')) {
+                    judgeSelectedGridByEdge(grid, o);
+                } else {
+                    judgeSelectedGrid(grid, o);
+                }
+            };
+
+            if (mode == "marker") {
+                client = e.overlay.point;
+            };
+           
+        };
+
+
+        $("#query1").click(function () {
+
+            alert($('#edge').is(':checked'));
+            var lng_input = $("#lng").val();
+            var lat_input = $("#lat").val();
+
+            if (lng_input == "" | lat_input == "") {
+
+            } else {
+                var sel = $("#Testpoint  option:selected").text();
+                if (sel == "1") {
+                   lng_input = "";
+                    lat_input = "";
+                }
+                if (sel == "2") {
+                    lng_input = "";
+                    lat_input = "";
+                }
+            }
+            ////rest/rest/query2/address/1?laty=121.463500&lngy=31.110255&lat=121.473500&lng=31.120255
+            //var url = "/rest/rest/query2/address/1?lngy=" + x + "&laty=" + y + "&lat="+lat+"&lng="+lng;
+            //$.ajaxSetup({ async: false });
+            //var code = 0;
+            //var obj;
+            //var t = $.getJSON(url, function (data) {
+            //    code = data[i]["code"];
+            //    obj = getPolygon(grid, code_list, code);
+            //    obj.setFillColor("yellow");
+            //});
+
+
+        });
+        //如果判断点在所有边界线的同侧，就能判定该点在多边形内部。
+
+        showShangjia();
+
+        var shangjia_create_list = [];
+        $("#shangjia_create").click(function () {
+
+            var name = $("#shangjia").val();
+            if (name == "") {
+                alert("请输入商家名字!!!");
+                exit;
+
+            }
+            if (shangjia_create_list.length == 0) {
+                alert("请画区域!!!");
+                exit;
+            }
+            var points_str = "";
+            var len = shangjia_create_list.length;
+            for (var i = 0; i < len-1; i++) {
+                var h=shangjia_create_list[i];
+                points_str += h.lng + "," + h.lat + "|";
+            }
+
+            points_str += shangjia_create_list[len - 1].lng + "," + shangjia_create_list[len - 1].lat;
+            var url = "/rest/rest/insert/shangjia1?lng_orig=" + x + "&lat_orig=" + y + "&name=" + name + "&location=" + points_str;
+            //$.ajaxSetup({ async: false });
+            var t = $.getJSON(url, function (data) {
+                $("#ShangjiaList").append("<option>" + name+ "</option>");
+                alert(name +" 创建成功");
+            });
+
+
+
+            alert(points_str);
+        });
+
+        $("#shangjia_show").click(function () {
+
+            var name = $("#ShangjiaList  option:selected").text();
+
+            var url = "/rest/rest/query/shangjia/name/"+name+"?type=0";
+            $.ajaxSetup({ async: false });
+            var points = [];
+            var t = $.getJSON(url, function (data) {
+                for (var i in data) {
+                    var p = new BMap.Point(data[i].lng, data[i].lat);
+                    points[i] = p;
+                }
+                
+                var rectangle = new BMap.Polygon(points, { strokeColor: "blue", strokeWeight: 2, strokeOpacity: 0.5 });  //创建矩形
+                map.addOverlay(rectangle);
+                overlays.push(rectangle);
+
+            });
+
+
+
+        });
+
+        //客户的位置
+        var client;
+        $("#shangjia_search").click(function () {
+
+            if (client == null) {
+                alert("请在地图选择一点!!!")
+                exit;
+
+            }
+            var str = "";
+
+            var url = "/rest/rest/query/shangjia1?lng_orig=" + x + "&lat_orig=" + y + "&lng=" + client.lng + "&lat=" + client.lat;
+            $.ajaxSetup({ async: false });
+            var t = $.getJSON(url, function (data) {
+
+                for (var i in data) {
+                    str += data[i]["name"] +" ";
+                }
+
+                
+            });
+
+            alert(str + " selected!!!");
+
+            //alert(str);
+        });
+
+
+        //判断方法就是判断两条同起点射线斜率差。
+        //p-点 polygon-多边形
+        function isPointInPolygon(p, polygon) {
+            {
+                var i, j;
+                var inside = false;
+                var count1 = 0;
+                var count2 = 0;
+                var N = polygon.length;
+                for (i = 0, j = N - 1; i < N; j = i++) {
+                    var value = (p.lng - polygon[j].lng) * (polygon[i].lat - polygon[j].lat) - (p.lat - polygon[j].lat) * (polygon[i].lng - polygon[j].lng);
+                    if (value > 0) {
+                        ++count1;
+                    }
+                    else if (value < 0) {
+                        ++count2;
+                    }
+                }
+
+                if (0 == count1 || 0 == count2) {
+                    inside = true;
+                }
+                return inside;
+            }
+        };
+
+        function showShangjia() {
+            $("#ShangjiaList").empty();
+            var url = "/rest/rest/query/shangjiaAll";
+            //$.ajaxSetup({ async: false });
+            var t = $.getJSON(url, function (data) {
+                for (var i in data) {
+                    $("#ShangjiaList").append("<option>" + data[i]["name"] + "</option>");
+                }
+                //alert("商家列表更新成功");
+            });
+        }
+        //找出网格所有的点,然后判断每个点是否在多边形内部
+        //g 网格, o-多边形
+        function judgeSelectedGrid(g, o) {
+
+            var sel_list = [];
+            var edge_list = [];
+            //TODO,找出网格所有的点,可以优化去掉重复,或者在画点的时候直接保存数组
+            //var array = [];
+            var index=0;
+            for (var l = 0; l < g.length; l++) {
+                var polygon = g[l];
+                var point = polygon.Fn;
+                for (var internal = 0; internal < 4; internal++) {
+                    var i_lat = point[internal].lat;
+                    var i_lng = point[internal].lng;
+                    var p = new BMap.Point(i_lng, i_lat);
+
+                    if (isPointInPolygon(p, o)) {
+                        polygon.setFillColor("green");
+                        sel_list[index++] = polygon;
+
+                    }
+                    
+                    //array[index] = p;
+                    //index++
+                }
+            }
+
+
+           console.log(sel_list.length);
+        };
+
+
+
+        //g-grid,o-points
+        function judgeSelectedGridByEdge(g, o) {
+
+            var ploygon;
+            var show_str = "";
+            //TODO,找出网格所有的点,可以优化去掉重复,或者在画点的时候直接保存数组
+            var array = [];
+            var index = 0;
+            for (var l = 0; l < o.length; l++) {
+                var p1 = o[l];
+                if (l == o.length - 1)
+                {
+                    p2 = o[0]
+                } else {
+                    var p2 = o[l + 1];
+                }
+                
+                //alert(p1.lng + " " + p1.lat + "-------" + p2.lng + " " + p2.lat);
+                //rest/rest/query2/address/1?laty=121.463500&lngy=31.110255&lat=121.473500&lng=31.120255
+                var url_qq = "/rest/rest/query3/address/1?lngy=" + x + "&laty=" + y + "&lat1="+p1.lat+"&lng1="+p1.lng+ "&lat2="+p2.lat+"&lng2="+p2.lng;
+                console.log(url_qq);
+                $.ajaxSetup({ async: false });
+                var t = $.getJSON(url_qq, function (data) {
+                    //alert(data.length);
+                    for (var i in data) {
+                        
+                        code = data[i]["code"];
+                        show_str += code + " ";
+                        ploygon = getPolygon(grid, code_list, code);
+                        array[index] = ploygon;
+                        index++;
+                        
+                    }
+                });
+
+            }
+
+            for(var i=0;i<array.length;i++){
+                array[i].setFillColor("green");
+            }
+            //alert(show_str);
+            return array;
+        };
+
+
+        var styleOptions = {
+            strokeColor: "red",    //边线颜色。
+            fillColor: "red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+            strokeWeight: 3,       //边线的宽度，以像素为单位。
+            strokeOpacity: 0.8,	   //边线透明度，取值范围0 - 1。
+            fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
+            strokeStyle: 'solid' //边线的样式，solid或dashed。
+        };
+        //实例化鼠标绘制工具
+        var drawingManager = new BMapLib.DrawingManager(map, {
+            isOpen: false, //是否开启绘制模式
+            enableDrawingTool: true, //是否显示工具栏
+            enableCalculate: true,
+            drawingToolOptions: {
+                anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
+                offset: new BMap.Size(5, 5), //偏离值
+            },
+            polygonOptions: styleOptions, //多边形的样式
+        });
+        //添加鼠标绘制工具监听事件，用于获取绘制结果
+        drawingManager.addEventListener('overlaycomplete', overlaycomplete);
+
+        function clearAll() {
+            for (var i = 0; i < overlays.length; i++) {
+                map.removeOverlay(overlays[i]);
+            }
+
+            for (var i = 0; i < grid.length; i++) {
+                grid[i].setFillColor("");
+            }
+            overlays.length = 0
+        };
+
+    </script>
+</body>
+</html>

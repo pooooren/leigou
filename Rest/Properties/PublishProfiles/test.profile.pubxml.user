@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>D:\workspace\leigou\bin\rest</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/app.xml">
+      <publishTime>03/30/2015 16:04:15</publishTime>
+    </File>
+    <File Include="bin/Biz.dll">
+      <publishTime>04/03/2015 17:49:08</publishTime>
+    </File>
+    <File Include="bin/Biz.pdb">
+      <publishTime>04/03/2015 17:49:07</publishTime>
+    </File>
+    <File Include="bin/BizData.dll">
+      <publishTime>02/28/2015 18:40:33</publishTime>
+    </File>
+    <File Include="bin/Bresenham.dll">
+      <publishTime>04/03/2015 12:57:55</publishTime>
+    </File>
+    <File Include="bin/Bresenham.exe">
+      <publishTime>04/02/2015 11:06:17</publishTime>
+    </File>
+    <File Include="bin/Bresenham.pdb">
+      <publishTime>04/03/2015 12:57:55</publishTime>
+    </File>
+    <File Include="bin/Common.dll">
+      <publishTime>04/03/2015 12:57:54</publishTime>
+    </File>
+    <File Include="bin/Common.pdb">
+      <publishTime>04/03/2015 12:57:54</publishTime>
+    </File>
+    <File Include="bin/Global.asax">
+      <publishTime>02/22/2015 20:44:40</publishTime>
+    </File>
+    <File Include="bin/Global.asax.cs">
+      <publishTime>03/30/2015 13:48:37</publishTime>
+    </File>
+    <File Include="bin/log4net.config">
+      <publishTime>03/30/2015 13:54:28</publishTime>
+    </File>
+    <File Include="bin/log4net.dll">
+      <publishTime>07/18/2013 07:53:26</publishTime>
+    </File>
+    <File Include="bin/LumenWorks.Framework.IO.dll">
+      <publishTime>07/18/2013 07:53:26</publishTime>
+    </File>
+    <File Include="bin/Microsoft.Web.Infrastructure.dll">
+      <publishTime>07/08/2013 15:15:08</publishTime>
+    </File>
+    <File Include="bin/Newtonsoft.Json.dll">
+      <publishTime>10/02/2013 12:10:10</publishTime>
+    </File>
+    <File Include="bin/Rest.dll">
+      <publishTime>04/03/2015 17:49:08</publishTime>
+    </File>
+    <File Include="bin/Rest.pdb">
+      <publishTime>04/03/2015 17:49:08</publishTime>
+    </File>
+    <File Include="bin/System.Net.Http.Formatting.dll">
+      <publishTime>07/09/2013 11:04:28</publishTime>
+    </File>
+    <File Include="bin/System.Web.Helpers.dll">
+      <publishTime>02/22/2015 20:44:46</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.dll">
+      <publishTime>07/09/2013 11:04:28</publishTime>
+    </File>
+    <File Include="bin/System.Web.Http.WebHost.dll">
+      <publishTime>07/09/2013 11:04:28</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.Deployment.dll">
+      <publishTime>02/22/2015 20:44:47</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.dll">
+      <publishTime>02/22/2015 20:44:47</publishTime>
+    </File>
+    <File Include="bin/System.Web.WebPages.Razor.dll">
+      <publishTime>02/22/2015 20:44:47</publishTime>
+    </File>
+    <File Include="bin/Web.config">
+      <publishTime>04/03/2015 14:38:34</publishTime>
+    </File>
+    <File Include="bin/Web.Debug.config">
+      <publishTime>02/22/2015 20:44:40</publishTime>
+    </File>
+    <File Include="bin/Web.Release.config">
+      <publishTime>02/22/2015 20:44:40</publishTime>
+    </File>
+    <File Include="favicon.ico">
+      <publishTime>02/22/2015 20:44:40</publishTime>
+    </File>
+    <File Include="Global.asax">
+      <publishTime>02/22/2015 20:44:40</publishTime>
+    </File>
+    <File Include="packages.config">
+      <publishTime>02/22/2015 21:08:10</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>04/03/2015 14:38:34</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,3 @@
+<App>
+  <mysqlstring>Database='leigou';Data Source='localhost';User Id='root';Password='admin';charset='utf8';pooling=true</mysqlstring>
+</App>
